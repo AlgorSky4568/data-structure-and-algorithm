@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/Zhuanz/Documents/data structure and algorithm/library manager'
+relocations:     []
+...
