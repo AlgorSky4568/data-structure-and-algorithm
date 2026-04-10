@@ -10,51 +10,23 @@ typedef struct Book {
     struct Book *next;
 } Book;
 
-Book* CreateBook(Book book) {
+Book* CreateBook(Book *pre_book,char Book_ID[], char Title[], char Author[], int Stock) {
     Book *newBook = (Book*)malloc(sizeof(Book));
     if(newBook == NULL) {
         return NULL;
     }
-    // 修正：正确的赋值顺序
-    strcpy(newBook->Book_ID, book.Book_ID);
-    strcpy(newBook->Title, book.Title);
-    strcpy(newBook->Author, book.Author);
-    newBook->Stock = book.Stock;  // 使用传入的库存值
+    //传入图书数据，创建图书节点，讲其与前节点连接起来
+    strcpy(newBook->Book_ID, Book_ID);
+    strcpy(newBook->Title, Title);
+    strcpy(newBook->Author, Author);
+    newBook->Stock = Stock;  
+    pre_book->next = newBook;
     newBook->next = NULL;
     return newBook;
 }
 
-void InsertBook(Book **head, Book book) {
-    Book *newBook = CreateBook(book);
-    if(newBook == NULL) {
-        return;
-    }
-    
-    if(*head == NULL) {
-        *head = newBook;
-        return;
-    }
-    
-    Book *temp = *head;
-    while(temp->next != NULL) {
-        temp = temp->next;
-    }
-    temp->next = newBook;
-}
-
 int DeleteBook(Book **head, char bookID[]) {  // 修正参数类型
-    if(*head == NULL) {
-        return 0;
-    }
-    
-    // 处理头节点
-    if(strcmp((*head)->Book_ID, bookID) == 0) {
-        Book *toDelete = *head;
-        *head = (*head)->next;
-        free(toDelete);
-        return 1;
-    }
-    
+    //头节点就是个空节点
     Book *prev = *head;
     Book *current = (*head)->next;
     
@@ -72,7 +44,7 @@ int DeleteBook(Book **head, char bookID[]) {  // 修正参数类型
 }
 
 int UpdateStock(Book *head, char bookID[], int newStock) {
-    Book *current = head;
+    Book *current = head->next;
     
     while(current != NULL) {
         if(strcmp(current->Book_ID, bookID) == 0) {  // 修正比较逻辑
@@ -86,7 +58,7 @@ int UpdateStock(Book *head, char bookID[], int newStock) {
 }
 
 Book* FindBook(Book *head, char bookID[]) {
-    Book *current = head;
+    Book *current = head->next;
     
     while(current != NULL) {
         if(strcmp(current->Book_ID, bookID) == 0) {  // 修正比较逻辑
@@ -106,7 +78,7 @@ void PrintBook(Book *book) {
 }
 
 void TraverseList(Book *head) {
-    Book *current = head;
+    Book *current = head->next;
     
     while(current != NULL) {
         PrintBook(current);
@@ -126,132 +98,39 @@ void FreeList(Book *head) {
 
 
 int main() {
-    Book *head = NULL; // 链表头节点
+    Book *head = (Book*)malloc(sizeof(Book)); // 链表头节点
+    head->next = NULL;
 
     // 添加图书信息
-    Book book1 = {"001", "C程序设计", "谭浩强", 10};
-    Book book2 = {"002", "数据结构", "严蔚敏", 5};
-    Book book3 = {"003", "算法导论", "Thomas H. Cormen", 3};
-    InsertBook(&head, book1);
-    InsertBook(&head, book2);
-    InsertBook(&head, book3);
+    Book *book1 = CreateBook(head,"001", "C程序设计", "谭浩强", 10);
+    Book *book2 = CreateBook(book1,"002", "数据结构", "严蔚敏", 5);
+    Book *book3 = CreateBook(book2,"003", "算法导论", "Thomas H. Cormen", 3);
 
     // 查找图书信息
-    FindBook(head, "002");
+    char BookID_1[20];
+    scanf("%s",BookID_1);
+    Book *book_1 = FindBook(head, BookID_1);
+    printf("查找的图书信息:\n");
+    PrintBook(book_1);
 
     // 修改图书库存数量
-    UpdateStock(head, "001", 8);
-    //TraverseList(head);
+    char BookID_2[20];
+    int stock_num;
+    scanf("%s %d",BookID_2,&stock_num);
+    if(UpdateStock(head, BookID_2, stock_num)){
+        printf("图书%s的库存数量已修改为%d!\n",BookID_2,stock_num);
+    }
 
     // 删除图书信息
-    DeleteBook(&head, "003");
+    char BookID_3[20];
+    scanf("%s",BookID_3);
+    if(DeleteBook(&head, BookID_3)){
+        printf("图书%s删除成功!\n",BookID_3);
+    }
 
     // 遍历输出图书列表
+    printf("图书列表:\n");
     TraverseList(head);
 
     return 0;
 }
-
-/*
-#include <stdio.h>
-#include <string.h>
-
-typedef struct Book{
-    char Book_ID[20];
-    char Title[100];
-    char Author[50];
-    int Stock;
-    struct Book *next;
-}Book;
-
-Book* CreateBook(Book book){
-    Book *newBook = (Book*)malloc(sizeof(Book));
-    if(newBook == NULL){
-        return NULL;
-    }
-    strcpy(book.Book_ID,newBook->Book_ID);
-    strcpy(book.Title, newBook->Title);
-    strcpy(book.Author,newBook->Author);
-    newBook->Stock = 1;
-    newBook->next = NULL;
-    return newBook;
-}
-
-void InsertBook(Book **head, Book book){
-    Book *temp = (Book*)malloc(sizeof(Book));
-    temp = head;
-    while(temp->next != NULL){
-        temp = temp->next;
-    }
-
-    Book *newBook = (Book*)malloc(sizeof(Book));
-    newBook = CreateBook(book);
-    temp->next = newBook;
-}
-
-int DeleteBook(Book **head, char bookID){
-    Book *temp1 = (Book*)malloc(sizeof(Book));
-    Book *temp2 = (Book*)malloc(sizeof(Book));
-    //temp2在temp1后面
-    temp1 = head;
-    
-    if(strcmp(temp1->Book_ID,bookID) && temp1 == head){
-        return 1;
-    }
-    temp1 = temp1->next;
-    temp2 = head;
-    while(strcmp(temp1->Book_ID,bookID) != 1){
-        if(temp1 == NULL){
-            return 0;
-        }
-        else{
-            temp2 = temp1;
-            temp1 = temp1->next;
-        }
-    }
-
-    temp2->next = temp1->next;
-    return 1;
-}
-
-int UpdataStock(Book *head, char bookID[],int newStock){
-    Book *temp1 = (Book*)malloc(sizeof(Book));
-    temp1 = head;
-    while(strcmp(temp1->Book_ID,bookID) != 1){
-        if(temp1 == NULL){
-            return 0;
-        }
-        else{
-            temp1 = temp1->next;
-        }
-    }
-
-    temp1->Stock = newStock;
-    return 1;
-}
-
-Book* FindBook(Book *head,char bookID[]){
-    Book *temp1 = (Book*)malloc(sizeof(Book));
-    temp1 = head;
-    while(strcmp(temp1->Book_ID,bookID) != 1){
-        if(temp1 == NULL){
-            return NULL;
-        }
-        else{
-            temp1 = temp1->next;
-        }
-    }
-
-    printf("书号:%c,书名:%c,作者:%c,库存:%d",temp1->Book_ID,temp1->Title,temp1->Author,temp1->Stock);
-    return temp1;
-}
-
-void TraverseList(Book *head){
-    Book *temp1 = (Book*)malloc(sizeof(Book));
-    temp1 = head;
-    while(temp1->next != NULL){
-        printf("书号:%c,书名:%c,作者:%c,库存:%d",temp1->Book_ID,temp1->Title,temp1->Author,temp1->Stock);
-    }
-}
-
-*/
