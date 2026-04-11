@@ -72,7 +72,7 @@ Book* FindBook(Book *head, char bookID[]) {
 
 void PrintBook(Book *book) {
     if(book != NULL) {
-        printf("书号:%s, 书名:%s, 作者:%s, 库存:%d\n", 
+        printf("书号:%s,书名:%s,作者:%s,库存:%d\n",
                book->Book_ID, book->Title, book->Author, book->Stock);
     }
 }
