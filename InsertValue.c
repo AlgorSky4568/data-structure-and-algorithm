@@ -29,7 +29,7 @@ int main() {
     if (!inserted) {
         nums2[j] = val;
     }
-    
+
     for (j = 0 ;j < m; j++) {
         printf("%d",nums2[j]);
         if (j < m - 1) {
