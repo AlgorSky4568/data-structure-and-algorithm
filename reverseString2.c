@@ -10,25 +10,45 @@ int main()
     char a[100];
     char b[100] = {'\0'};
     int k;
+
     scanf("%s %d", a, &k);
-    if (strlen(a) < k)
-    {
-        for (int i = 0; i < strlen(a); i++)
+    int index = 0; //表示字符串起始位，每次自增2k
+    int len = strlen(a);
+
+    while (1) {
+        if (len - index <= k)
         {
-            b[i] = a[strlen(a) - 1 - i];
+            for (int i = index; i < len; i++)
+            {
+                b[i] = a[len - i - 1 + index];//剩下的字符数不到k，全部翻转
+            }
+            break;
+        }
+        else if (k < len - index && len - index <= 2*k)
+        {
+            for (int i = index; i < index + k; i++)
+            {
+                b[i] = a[index + k - 1-  (i - index)];
+            }
+            for (int i = index + k; i < len; i++)
+            {
+                b[i] = a[i];
+            }
+            break;
+        }
+        else {
+            for (int i = index; i < index + k; i++)
+            {
+                b[i] = a[index + k - 1-  (i - index)];
+            }
+            for (int i = index + k; i < index + 2 * k; i++)
+            {
+                b[i] = a[i];
+            }
+            index += 2 * k;
         }
     }
-    else
-    {
-        for (int i = 0; i < k; i++)
-        {
-            b[i] = a[k-1-i];
-        }
-        for (int i = k; i < strlen(a); i++)
-        {
-            b[i] = a[i];
-        }
-    }
+
     printf("%s",b);
 
     return 0;
