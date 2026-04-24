@@ -53,7 +53,7 @@ int Push(Stack *s, DataType e)
     }
     else
     {
-        s->data[s->top++] = e;
+        s->data[++s->top] = e;
         return 1;
 
     }
@@ -154,6 +154,7 @@ void InitQueue(Queue *Q)
     InitStack(Q->stack_out);
 }
 
+
 /**
  * 获取队列头（不删除元素）
  * @param Q 操作队列
@@ -211,8 +212,14 @@ int EnQueue(Queue *Q, DataType e)
     }
     else
     {
-        Push(Q->stack_in,e);
-        return 1;
+        if (Push(Q->stack_in,e))
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
 }
@@ -225,9 +232,20 @@ int EnQueue(Queue *Q, DataType e)
  */
 int DeQueue(Queue *Q, DataType *e)
 {
-    if (Q->stack_out->top == -1)
+    if (Q->stack_out->top == -1 && Q->stack_in->top == -1)
     {
         return 0;
+    }
+    else if (Q->stack_out->top == -1 && Q->stack_in->top != -1)
+    {
+        while (Q->stack_in->top != -1)
+        {
+            DataType tmp;
+            Pop(Q->stack_in,&tmp);
+            Push(Q->stack_out,tmp);
+        }
+        Pop(Q->stack_out,e);
+        return 1;
     }
     else
     {
@@ -264,29 +282,29 @@ int QueueLength(Queue Q)
  */
 void QueueToArray(Queue Q, DataType *seq)
 {
-    if (Q.stack_in->top == -1)
+    if (Q.stack_in->top == -1) //元素全在out栈里了
     {
         for (int i = 0; i < Q.stack_out->top + 1; i++)
         {
-            seq[i] = Q.stack_out->data[i];
+            seq[i] = Q.stack_out->data[Q.stack_out->top - i];
         }
     }
     else if (Q.stack_out->top != -1 && Q.stack_in->top != -1)
     {
         for (int i = 0; i <  Q.stack_out->top + 1; i++)
         {
-            seq[i] = Q.stack_out->data[i];
+            seq[i] = Q.stack_out->data[Q.stack_out->top - i];
         }
         for (int i = 0; i < Q.stack_in->top + 1; i++)
         {
-            seq[Q.stack_out->top + 1 + i] = Q.stack_in->data[Q.stack_in->top - i];
+            seq[Q.stack_out->top + 1 + i] = Q.stack_in->data[i];
         }
     }
     else
     {
         for (int i = 0; i < Q.stack_in->top + 1; i++)
         {
-            seq[i] = Q.stack_in->data[Q.stack_out->top -i];
+            seq[i] = Q.stack_in->data[i];
         }
     }
 
