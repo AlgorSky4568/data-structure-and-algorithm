@@ -49,37 +49,24 @@ maze* create_maze(int **graph,int m,int n)
     return mazes;
 }
 
-void find_path(maze* mazes, int m, int n,int index,int* result)
+void find_path(maze* mazes, int target,int index,int* result)
 {
-    if (index == m*n - 1)
+    if (index == target)
     {
         (*result) ++;
         return;
     }
     for (int i = 0; i < 4; i ++)
     {
-        if (mazes[index].neighbours[i] != NULL || mazes[index].neighbours[i]->visited == 0 )
+        maze* neighbour = mazes[index].neighbours[i];
+        if (neighbour && !neighbour->visited)
         {
-            mazes[index].neighbours[i]->visited=1;
-            if (i == 0)
-            {
-                find_path(mazes, m, n,index-1,result);
+            int neighbour_index = (int)(neighbour - mazes);
+            find_path(mazes,target,neighbour_index,result);
 
-            }
-            else if (i == 1)
-            {
-                find_path(mazes, m, n,index - n,result);
-            }
-            else if (i == 2)
-            {
-                find_path(mazes, m, n,index+1,result);
-            }
-            else
-            {
-                find_path(mazes, m, n,index+n,result);
-            }
         }
     }
+    mazes[index].visited = 0;
 }
 
 int main()
@@ -102,22 +89,24 @@ int main()
     }
 
     int result = 0;
-    if (m == 1 && n == 1)
-    {
-        result = 1;
-    }
-    else if (graph[0][0] == 1 || graph[m-1][n-1] == 1)
+    if (graph[0][0] == 1 || graph[m-1][n-1] == 1)
     {
         result = 0;
+    }
+    else if (m == 1 && n == 1)
+    {
+        result = 1;
     }
     else
     {
         maze* mazes = create_maze(graph,m,n);
-        find_path(mazes,m,n,0,&result);
+        find_path(mazes,m*n -1,0,&result);
+        free(mazes);
     }
 
     printf("%d", result);
-
+    for (int i = 0; i < m; i++) free(graph[i]);
+    free(graph);
 
     return 0;
 }
