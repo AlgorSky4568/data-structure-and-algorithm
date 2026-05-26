@@ -16,32 +16,32 @@ void init_maze(maze* m)
     }
 }
 
-maze** create_maze(int **graph,int m,int n)
+maze* create_maze(int **graph,int m,int n)
 {
-    struct maze** mazes = (struct maze**)malloc((n*m) * sizeof(struct maze));
-    int index = 0; //mazes的下标
+    maze* mazes = malloc((n*m) * sizeof(maze));
 
     for (int i = 0; i < m; i++)
     {
         for (int j = 0; j < n; j++)
         {
+            init_maze(&mazes[n*i+j]);
             if (graph[i][j] == 0)
             {
                 if (j > 0 && graph[i][j-1] == 0)
                 {
-                    mazes[n * i + j]->neighbours[0] == mazes[n*i +j-1];
+                    mazes[n * i + j].neighbours[0] = &mazes[n*i +j-1];
                 }
                 if (i > 0 && graph[i-1][j] == 0)
                 {
-                    mazes[n*i +j]->neighbours[1] == mazes[(n-1)*i + j];
+                    mazes[n*i +j].neighbours[1] = &mazes[(i-1)*n + j];
                 }
                 if (j < n - 1 && graph[i][j+1] == 0)
                 {
-                    mazes[n*i +j]->neighbours[2] == mazes[n*i+j+1];
+                    mazes[n*i +j].neighbours[2] = &mazes[n*i+j+1];
                 }
                 if (i < m - 1 && graph[i+1][j] == 0)
                 {
-                    mazes[n*i +j]->neighbours[3] == mazes[(n+1)*i + j];
+                    mazes[n*i +j].neighbours[3] = &mazes[(i+1)*n + j];
                 }
             }
         }
@@ -49,13 +49,18 @@ maze** create_maze(int **graph,int m,int n)
     return mazes;
 }
 
-void find_path(maze** mazes, int m, int n,int index,int* result)
+void find_path(maze* mazes, int m, int n,int index,int* result)
 {
+    if (index == m*n - 1)
+    {
+        (*result) ++;
+        return;
+    }
     for (int i = 0; i < 4; i ++)
     {
-        if (mazes[index]->neighbours[i] != NULL || mazes[index]->neighbours[i]->visited == 0 )
+        if (mazes[index].neighbours[i] != NULL || mazes[index].neighbours[i]->visited == 0 )
         {
-            mazes[index]->neighbours[i]->visited=1;
+            mazes[index].neighbours[i]->visited=1;
             if (i == 0)
             {
                 find_path(mazes, m, n,index-1,result);
@@ -74,10 +79,6 @@ void find_path(maze** mazes, int m, int n,int index,int* result)
                 find_path(mazes, m, n,index+n,result);
             }
         }
-    }
-    if (index == m*n - 1)
-    {
-        *result ++;
     }
 }
 
@@ -109,9 +110,12 @@ int main()
     {
         result = 0;
     }
+    else
+    {
+        maze* mazes = create_maze(graph,m,n);
+        find_path(mazes,m,n,0,&result);
+    }
 
-    maze** mazes = create_maze(graph,m,n);
-    find_path(mazes,m,n,0,&result);
     printf("%d", result);
 
 
