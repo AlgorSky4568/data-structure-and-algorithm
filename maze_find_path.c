@@ -56,6 +56,7 @@ void find_path(maze* mazes, int target,int index,int* result)
         (*result) ++;
         return;
     }
+    mazes[index].visited = 1;
     for (int i = 0; i < 4; i ++)
     {
         maze* neighbour = mazes[index].neighbours[i];
@@ -79,9 +80,6 @@ int main()
     for (int i = 0; i < m; i++)
     {
         graph[i] = (int*)malloc(n*sizeof(int));
-    }
-    for (int i = 0; i < m; i++)
-    {
         for (int j = 0; j < n; j++)
         {
             scanf("%d", &graph[i][j]);
