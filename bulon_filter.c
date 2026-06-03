@@ -27,12 +27,12 @@ void bloom_free(BloomFilter *filter) {
 
 // 设置位数组中的某一位
 void set_bit(BloomFilter *filter, unsigned int index) {
-    filter->bit_array[index / 8] |= (1 << (index % 8));
+    filter->bit_array[index / 8] |= (1 << (index % 8)); //index/8表示第几个字节，index%8表示这个字节的第几位，低位位0
 }
 
 // 检查位数组中的某一位
 int get_bit(BloomFilter *filter, unsigned int index) {
-    return (filter->bit_array[index / 8] >> (index % 8)) & 1;
+    return (filter->bit_array[index / 8] >> (index % 8)) & 1; //将对应字节右移index%8位，看是不是1
 }
 
 // 哈希函数1
