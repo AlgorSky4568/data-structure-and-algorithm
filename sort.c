@@ -40,9 +40,8 @@ void fast_sort(int* list, int begin,int end)
     int high = end;
     while (low < high)
     {
-        while(low < high && list[high] >= flag) high --;
-        swap(list,low,high);
-        while (low < high && list[low] <= flag) low ++;
+        while(low < high && list[high] > flag) high --;
+        while (low < high && list[low] < flag) low ++;
         swap(list,low,high);
     }
     fast_sort(list,begin,high);
